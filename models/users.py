@@ -11,5 +11,4 @@ class UserDB(Base):
     email : Mapped[str]
     password : Mapped[str]
     fullname : Mapped[str]
-    role : Mapped[str]
     created_at : Mapped[datetime] = mapped_column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc))
