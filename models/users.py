@@ -9,7 +9,7 @@ class UserDB(Base):
     __tablename__ = "Users"
 
     id : Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    email : Mapped[str]
+    email : Mapped[str] = mapped_column(unique=True)
     password : Mapped[str]
     fullname : Mapped[str]
     global_role : Mapped[GlobalRole] = mapped_column(Enum(GlobalRole), default=GlobalRole.user, server_default="user")
