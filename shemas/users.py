@@ -1,6 +1,9 @@
-from pydantic import BaseModel, EmailStr, field_validator, Field
+from pydantic import BaseModel, EmailStr, field_validator, Field 
 
 class UserMODELS(BaseModel):
+
+    model_config = {"extra":"forbid"}
+
     email : EmailStr 
     password : str = Field(examples=["MyPass#2024"])
     fullname : str
