@@ -11,5 +11,5 @@ class TenantDB(Base):
     name  : Mapped[str] = mapped_column(String(50))
     plane_id : Mapped[int] = mapped_column(ForeignKey("Plans.id", ondelete="RESTRICT"))
     subscription_status : Mapped[int] = mapped_column(ForeignKey("Statuses.id", ondelete="RESTRICT"))
-    current_period_end : Mapped[datetime]
+    current_period_end : Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc))
