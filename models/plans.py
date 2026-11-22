@@ -5,7 +5,7 @@ from database import Base
 
 class PlaneDB(Base):
 
-    __tablename__ = "Planes"
+    __tablename__ = "Plans"
 
     id : Mapped[int] = mapped_column(primary_key=True)
     name  : Mapped[str] = mapped_column(String(50),unique=True)
