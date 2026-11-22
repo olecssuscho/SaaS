@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm,HTTPBearer,HTTPAuthorizationCredentials
-from shemas.password import ChangePasswordSchema
+from shemas.passwords import ChangePasswordSchema
 from shemas.users import UserMODELS
 from depends import get_current_user, get_db
 from sqlalchemy.ext.asyncio import AsyncSession
