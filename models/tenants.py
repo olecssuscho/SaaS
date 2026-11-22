@@ -9,6 +9,6 @@ class TenantDB(Base):
 
     id : Mapped[int] = mapped_column(primary_key=True ,autoincrement=True)
     name  : Mapped[str] = mapped_column(String(50),unique=True)
-    plane_id : Mapped[int] = mapped_column(ForeignKey("Planes.id"))
-    subscription_status : Mapped[int] = mapped_column(ForeignKey("Statuses.id"))
+    plane_id : Mapped[int] = mapped_column(ForeignKey("Planes.id", ondelete="RESTRICT"))
+    subscription_status : Mapped[int] = mapped_column(ForeignKey("Statuses.id", ondelete="RESTRICT"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc))
