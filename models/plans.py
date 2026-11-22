@@ -17,4 +17,5 @@ class PlaneDB(Base):
     allow_custom_domain: Mapped[bool] = mapped_column(default=False)
     allow_api: Mapped[bool] = mapped_column(default=False)
     is_active : Mapped[bool] = mapped_column(default=True)
+    period_days : Mapped[int | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc))
