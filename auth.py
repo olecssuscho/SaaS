@@ -1,6 +1,6 @@
 import uuid
 import jwt
-from jwt.exceptions import PyJWKError
+from jwt.exceptions import PyJWKError,DecodeError
 from config import settings
 from passlib.context import CryptContext  
 from datetime import datetime,timedelta,timezone
@@ -39,5 +39,5 @@ def decode_token(token:str)->dict:
     try:
         payload = jwt.decode(token,settings.SECRET_KEY,settings.ALGORITHM)
         return payload
-    except PyJWKError:
+    except PyJWKError,DecodeError:
         return None
