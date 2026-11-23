@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import DateTime, String
 from database import Base
 
-class PlaneDB(Base):
+class PlanDB(Base):
 
     __tablename__ = "Plans"
 
