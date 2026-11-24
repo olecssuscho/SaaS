@@ -10,20 +10,19 @@ from sqlalchemy.exc import SQLAlchemyError
 logger = logging.getLogger(__name__)
 
 async def find_plan(db:AsyncSession,name:str = "Free"):
-    stmt = await db.execute(select(models.PlanDB).filter(models.PlanDB.name == name))
-    plan_db = stmt.scalar_one_or_none()
+    result = await db.execute(select(models.PlanDB).where(models.PlanDB.name == name, models.PlanDB.is_active.is_(True)))
+    plan_db = result.scalar_one_or_none()
     if plan_db is None:
-        logger.warning(f"Someone have tried to register with plan {name}, but it is not exist")
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="That plane is not exist")
-    else:
-        return plan_db
+        logger.error(f"Someone have tried to register with plan {name}, but it is not exist")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+    return plan_db
 
 async def find_status(db:AsyncSession,name:str = "active"):
-    stmt = await db.execute(select(models.StatusDB).filter(models.StatusDB.name == name))
-    status_db = stmt.scalar_one_or_none()
+    result = await db.execute(select(models.StatusDB).filter(models.StatusDB.name == name))
+    status_db = result.scalar_one_or_none()
     if status_db is None:
-        logger.warning(f"Someone have tried to register with plan {name}, but it is not exist")
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="That plane is not exist")
+        logger.error(f"Someone have tried to register with plan {name}, but it is not exist")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Internal server error")
     else:
         return status_db
 
@@ -39,7 +38,6 @@ async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:
         user_id = user.id
         # plan's id, period
         plan_db = await find_plan(db)
-
         plan_id_db = plan_db.id
         plan_period_db = plan_db.period_days
  
