@@ -13,10 +13,19 @@ async def find_plan(db:AsyncSession,name:str = "Free"):
     stmt = await db.execute(select(models.PlanDB).filter(models.PlanDB.name == name))
     plan_db = stmt.scalar_one_or_none()
     if plan_db is None:
-        logger.warning("Someone have tried to register with plan (Free), but it is not exist")
+        logger.warning(f"Someone have tried to register with plan {name}, but it is not exist")
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="That plane is not exist")
     else:
         return plan_db
+
+async def find_status(db:AsyncSession,name:str = "active"):
+    stmt = await db.execute(select(models.StatusDB).filter(models.StatusDB.name == name))
+    status_db = stmt.scalar_one_or_none()
+    if status_db is None:
+        logger.warning(f"Someone have tried to register with plan {name}, but it is not exist")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="That plane is not exist")
+    else:
+        return status_db
 
 async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:AsyncSession):
     try:
@@ -35,8 +44,8 @@ async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:
         plan_period_db = plan_db.period_days
  
         # subscription status
-        stmt = await db.execute(select(models.StatusDB).filter(models.StatusDB.name == "active"))
-        status_id = stmt.scalar_one_or_none().id
+        status_ = await find_status(db)
+        status_id = status_.id
 
         added_tenant = models.TenantDB(
             name = tenant.name, plane_id = plan_id_db, subscription_status = status_id, 
