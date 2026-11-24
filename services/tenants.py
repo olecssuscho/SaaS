@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 logger = logging.getLogger(__name__)
 
 async def find_plan(db:AsyncSession,name:str = "Free"):
-    stmt = await db.execute(select(models.PlanDB).filter(models.PlanDB.name == "Free"))
+    stmt = await db.execute(select(models.PlanDB).filter(models.PlanDB.name == name))
     plan_db = stmt.scalar_one_or_none()
     if plan_db is None:
         logger.warning("Someone have tried to register with plan (Free), but it is not exist")
