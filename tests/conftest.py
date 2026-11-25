@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.pool import NullPool
 from database import Base
 from sqlalchemy.ext.asyncio import create_async_engine,async_sessionmaker
-from sqlalchemy import create_engine, insert, update
+from sqlalchemy import create_engine, insert
 from depends import get_db
 from main import app
 import models
