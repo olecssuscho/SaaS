@@ -21,8 +21,8 @@ async def find_status(db:AsyncSession,name:str = "active"):
     result = await db.execute(select(models.StatusDB).filter(models.StatusDB.name == name))
     status_db = result.scalar_one_or_none()
     if status_db is None:
-        logger.error(f"Someone have tried to register with plan {name}, but it is not exist")
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Internal server error")
+        logger.error(f"Someone have tried to register with status {name}, but it is not exist")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
     else:
         return status_db
 
