@@ -4,6 +4,7 @@ from database import Async_Session
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+import models
 from models.users import UserDB 
 import logging
 
@@ -30,3 +31,10 @@ async def get_current_user(token:str = Depends(user_schema),db:AsyncSession = De
             logger.warning(f"Authentication failed: no user found for email {payload['email']}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User with that credentials no found")
         return user
+
+async def get_role(user:models.UserDB,db:AsyncSession = Depends(get_db),role:str = "admin"):
+    if user.global_role != role:
+        logger.warning(f"User: {user.email} with {user.global_role} role tried to use admin endpoint")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed")
+    logger.info(f"User: {user.email} using admin endpoint")
+    return True
