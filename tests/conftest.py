@@ -6,6 +6,7 @@ from database import Base
 from sqlalchemy.ext.asyncio import create_async_engine,async_sessionmaker
 from sqlalchemy import create_engine, insert
 from depends import get_db
+from lim import limiter
 from main import app
 import models
 
@@ -49,6 +50,7 @@ def clean_tables():
 
 @pytest.fixture(scope="session")
 def client():
+    limiter.enabled = False
     app.dependency_overrides[get_db] = override_db
     with TestClient(app) as c:
         yield c 
