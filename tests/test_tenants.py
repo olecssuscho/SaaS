@@ -22,6 +22,12 @@ def test_creation_do_not_work_due_to_exist_company(client,create_user):
 def test_creation_to_not_work_due_not_exist_plan(client,create_user):
     with sync_engine.begin() as conn:
         conn.execute(models.PlanDB.__table__.delete())
+    tenant = client.post("/tenant/register", json={"name":"Test sd"},
+                              headers={"Authorization":f"Bearer {create_user["first_token"]}"})
+    assert tenant.status_code == 500
+
+def test_creation_to_not_work_due_not_exist_status(client,create_user):
+    with sync_engine.begin() as conn:
         conn.execute(models.StatusDB.__table__.delete())
     tenant = client.post("/tenant/register", json={"name":"Test sd"},
                               headers={"Authorization":f"Bearer {create_user["first_token"]}"})
