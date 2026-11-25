@@ -1,6 +1,6 @@
 import logging
 from fastapi import FastAPI
-from routers import users,tenants
+from routers import users,tenants,admin
 from lim import limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
@@ -11,8 +11,11 @@ logging.basicConfig(level=logging.INFO,format="%(asctime)s - %(name)s - %(leveln
 
 app = FastAPI()
 
+add_pagination(app)
+
 app.include_router(users.router)
 app.include_router(tenants.router)
+app.include_router(admin.router)
 
 add_pagination(app)
 app.state.limiter = limiter
