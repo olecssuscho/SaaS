@@ -8,7 +8,7 @@ class TenantDB(Base):
     __tablename__ = "Tenants"
 
     id : Mapped[int] = mapped_column(primary_key=True ,autoincrement=True)
-    name  : Mapped[str] = mapped_column(String(50))
+    name  : Mapped[str] = mapped_column(String(50),unique=True)
     plane_id : Mapped[int] = mapped_column(ForeignKey("Plans.id", ondelete="RESTRICT"))
     subscription_status : Mapped[int] = mapped_column(ForeignKey("Statuses.id", ondelete="RESTRICT"))
     current_period_end : Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
