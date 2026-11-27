@@ -1,13 +1,18 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException,status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import models
 from shemas import roles
 import logging
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError,IntegrityError
 
 logger = logging.getLogger(__name__)
+
+def calc_period_end(plan: models.PlanDB, now: datetime):
+    if plan.period_days is None:
+        return None
+    return now + timedelta(days=plan.period_days)
 
 async def find_plan(db:AsyncSession,name:str = "Free"):
     result = await db.execute(select(models.PlanDB).where(models.PlanDB.name == name, models.PlanDB.is_active.is_(True)))
@@ -39,7 +44,6 @@ async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:
         # plan's id, period
         plan_db = await find_plan(db)
         plan_id_db = plan_db.id
-        plan_period_db = plan_db.period_days
  
         # subscription status
         status_ = await find_status(db)
@@ -47,12 +51,11 @@ async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:
 
         added_tenant = models.TenantDB(
             name = tenant.name, plane_id = plan_id_db, subscription_status = status_id, 
-            current_period_end = plan_period_db, created_at = now
+            current_period_end = None, created_at = now
         )
 
         db.add(added_tenant)
-        await db.commit()
-        await db.refresh(added_tenant)
+        await db.flush()
         tenant_id = added_tenant.id
         tenant_role = roles.TenantRole.owner
 
@@ -64,9 +67,12 @@ async def register_tenant_services(tenant:models.TenantDB,user:models.UserDB,db:
         await db.commit()
         await db.refresh(added_tenant)
         return added_tenant
-    except (ValueError,SQLAlchemyError) as e:
-        db.rollback()
+    except IntegrityError as e:
         logger.exception(f"Something went wrong: {e}")
-        raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=f"Content: {e}")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Name was used")
+    except (ValueError,SQLAlchemyError) as e:
+        await db.rollback()
+        logger.exception(f"Something went wrong: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
