@@ -56,17 +56,11 @@ def test_exception(client,create_user):
     with patch("services.tenants.AsyncSession.commit",side_effect=SQLAlchemyError(".")):
         tenant = client.post("/tenant/register", json={"name":"Test sd"},
                               headers={"Authorization":f"Bearer {create_user["first_token"]}"})
-    assert tenant.status_code == 415
+    assert tenant.status_code == 500
 
     with sync_engine.begin() as conn:
-        res_tenants = conn.execute(select(models.TenantDB))
-        res_member = conn.execute(select(models.TenantMembershipDB))
-        res_tenants_list=[]
-        res_member_list=[]
-        for i in res_tenants:
-            res_tenants_list.append(i)
-        for i in res_member:
-            res_member_list.append(i)
-        
-    assert len(res_tenants_list)==0
-    assert len(res_member_list)==0
+        tenants = conn.execute(select(models.TenantDB)).all()
+        members = conn.execute(select(models.TenantMembershipDB)).all()
+    
+    assert len(tenants) == 0
+    assert len(members) == 0
